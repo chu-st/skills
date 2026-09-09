@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -118,6 +119,40 @@ def extract_response(provider, output):
     return response.strip() + "\n", reported
 
 
+def extract_usage(provider, output):
+    """Preserve provider counters; do not invent comparable totals or bills."""
+    try:
+        raw = (output / "stdout.log").read_text(encoding="utf-8-sig")
+        if provider == "claude":
+            payload = json.loads(raw)
+            if isinstance(payload, list):
+                payload = next((x for x in reversed(payload) if isinstance(x, dict)
+                                and x.get("type") == "result"), {})
+            source = "claude.result"
+            keys = ("input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens")
+            counters, cost = payload.get("usage", {}), payload.get("total_cost_usd")
+        elif provider == "codex":
+            events = [json.loads(line) for line in raw.splitlines() if line.strip()]
+            payload = next((x for x in reversed(events) if isinstance(x, dict)
+                            and x.get("type") == "turn.completed"), {})
+            source = "codex.turn.completed"
+            keys = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens",
+                    "output_tokens", "reasoning_output_tokens")
+            counters, cost = payload.get("usage", {}), None
+        else:
+            return None
+        def number(value):
+            return (isinstance(value, (int, float)) and not isinstance(value, bool)
+                    and math.isfinite(value) and value >= 0)
+        values = {key: counters[key] for key in keys if number(counters.get(key))}
+        result = {"source": source, "tokens": values}
+        if number(cost):
+            result["reported_cost_usd"] = cost
+        return result if values or "reported_cost_usd" in result else None
+    except (OSError, ValueError, TypeError, AttributeError):
+        return None
+
+
 def run(args):
     brief = sys.stdin.read() if args.prompt == "-" else Path(args.prompt).read_text(encoding="utf-8-sig")
     if not brief.strip():
@@ -167,6 +202,7 @@ def run(args):
         return_code = 2
     finally:
         receipt.update(finished_at=timestamp(), elapsed_seconds=round(time.monotonic() - start, 3))
+        receipt["usage"] = extract_usage(args.provider, output)
         write_json(output / "receipt.json", receipt)
     print(json.dumps({"execution_status": receipt["execution_status"], "receipt": str(output / "receipt.json"),
                       "error": receipt.get("error")}, ensure_ascii=False), flush=True)

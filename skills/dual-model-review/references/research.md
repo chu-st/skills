@@ -33,6 +33,8 @@ does not constitute multiple independent confirmations.
 For a recommendation, identify the decisive assumptions and the smallest new
 observation that would change it. A model's plausible scenario is a hypothesis,
 not a documented event. Estimates require inputs and ranges, not invented precision.
+Keep the source's finding separate from your proposed action. During revision,
+do not turn a qualified observation into a universal rule or remove its limitations.
 
 For medical, legal, financial, or other consequential research, check current
 authoritative sources and communicate material uncertainty. A second model is

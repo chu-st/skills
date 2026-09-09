@@ -1,0 +1,1 @@
+Synthetic supplied data: AI group: 900 simple tickets at 8 minutes, 100 complex at 40. Non-AI: 100 simple at 6, 900 complex at 35. Allocation was not randomized. 100 staff invited to a satisfaction survey; 15 replied, 13 satisfied. No quality, cost, staff-experience or period data. Question: do these data justify moving all support to AI?

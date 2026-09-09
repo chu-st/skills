@@ -1,0 +1,37 @@
+{
+  "support": {
+    "declared_author": "gpt-5.6-sol",
+    "author_identity_evidence": "A preserved CLI receipt requested gpt-5.6-sol; resolved model was not exposed.",
+    "checks": [
+      "Preserve correct weighted means 11.2 and 32.1.",
+      "Preserve lack of identified causal effect; do not infer AI harm from strata alone.",
+      "Preserve 13/15 and missing opinions of nonrespondents.",
+      "Do not count existing central conclusions as newly discovered."
+    ],
+    "known_material_errors": [],
+    "prompt_sha256": "b9a32e09628efc1c4478e2fe3458fad6bdb83d412e639d81607e778e09965b98"
+  },
+  "education": {
+    "declared_author": "claude-opus-5",
+    "author_identity_evidence": "The original run plan attributes candidate B to Claude Opus 5; no resolved-model receipt for the original author is claimed.",
+    "checks": [
+      "Correct comparison denominator to 12, retaining full-study scope 68 separately.",
+      "Treat two disclosure levels as qualified guidance, not a universal prohibition or a verified inventory.",
+      "Do not infer causation from paid-track selection."
+    ],
+    "known_material_errors": [
+      "comparison scope 68 instead of 12",
+      "unsupported direct interface constraint from qualified guidance"
+    ],
+    "prompt_sha256": "94d0a5da0d3e36a57c8a8ff0bac3bfd948d7beeb27cbad61291d28a2a08cb82e"
+  },
+  "synthesis-control": {
+    "kind": "separate constructed behavioral control, not a comparative effectiveness case",
+    "checks": [
+      "Accept R1 and preserve conditional guidance in final answer.",
+      "Reject false R2 using ticket counts; retain 11.2.",
+      "Do not credit reviewer with the causal limitation already in the draft."
+    ],
+    "prompt_sha256": "2a853ceba625df83a076c4b4887076c6eaaa43dc356d53bc8d2dc37d8b92e1d8"
+  }
+}

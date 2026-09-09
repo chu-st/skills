@@ -19,6 +19,12 @@ Resolve material disagreements with primary sources, calculations or reproducibl
 examples. Distinguish facts, hypotheses and preferences. Agreement is not proof.
 Confirm or reject each material finding. Normally use one independent peer answer
 and, only if needed, one focused follow-up.
+Critique the claim actually made; do not strengthen it to refute it or invent
+rejected objections. No material findings is a legitimate result.
+
+After synthesis, check that accepted corrections and qualifications survive in
+the final text and that new claims are supported. Compare with the saved first
+answer; do not credit the reviewer with conclusions already present.
 
 Return the useful answer, what the peer changed, checks actually performed,
 remaining uncertainty, and the model that really participated. A peer's suggestion

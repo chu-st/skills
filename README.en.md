@@ -1,5 +1,7 @@
 # CHU.ST Skills
 
+[![Dual-model review · chu.st](assets/brand/skills-cover.png)](https://chu.st/?utm_source=github&utm_medium=referral&utm_campaign=skills&utm_content=cover_en)
+
 An open, evidence-oriented second opinion for research, decisions, plans, documents,
 and code. Built at [chu.st — Чувство управления](https://chu.st/).
 
@@ -18,6 +20,8 @@ and research example are primarily in Russian.
 
 [Install](docs/install.md) · [Transport details](skills/dual-model-review/references/transports.md)
 · [Research example](examples/research/README.md) · [Validation](docs/validation.md)
+
+[Pilot: same-model and different-model review](evaluations/2026-09-pilot/results.md)
 
 Two models agreeing is not evidence of correctness. Validate material findings
 against primary evidence or reproducible checks. Record limitations and distinguish

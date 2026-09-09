@@ -1,5 +1,7 @@
 # CHU.ST Skills
 
+[![Двухмодельная проверка · Чувство управления](assets/brand/skills-cover.png)](https://chu.st/?utm_source=github&utm_medium=referral&utm_campaign=skills&utm_content=cover)
+
 **Исследуйте вопросы и проверяйте решения с выбранной второй моделью.**
 
 Открытые инструменты проекта [«Чувство управления» · chu.st](https://chu.st/?utm_source=github&utm_medium=referral&utm_campaign=skills).
@@ -10,6 +12,8 @@
 [Установка](docs/install.md) · [Пример исследования](examples/research/README.md)
 
 [Проверенный разбор примера](examples/research/worked-example.md) · [Что действительно проверено](docs/validation.md)
+
+[Пилот: повторная проверка той же и другой моделью](evaluations/2026-09-pilot/results.md)
 
 ## Начните обычным запросом
 

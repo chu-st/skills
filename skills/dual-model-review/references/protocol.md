@@ -38,9 +38,16 @@ Record consequential findings as:
 - **Disposition:** confirmed + change, rejected + reason, or unresolved + what
   would settle it. A suspicion without evidence does not become a confirmed error.
 
+For an accepted material correction, retain the original claim, the correction,
+and its location in the final answer. This can be a short note; no separate file
+is needed for a small task. After synthesis, check those locations against the
+evidence and check any newly introduced claims. Preserve scope and qualifications.
+
 Do not impose a finding quota. “No material findings” is legitimate. Unsupported
 allegations and preferences do not count as defects. Do not lower severity to fit
 a quota or hide material findings in an appendix nobody reviews.
+Critique the claim actually made, without strengthening it to refute it. Report
+only criticism actually raised; do not invent rejected objections to fill a section.
 
 ## Resolving disagreement
 
@@ -49,6 +56,11 @@ reproduction. For designs and decisions, evaluate criteria, costs, alternatives,
 reversibility, and failure conditions. If these do not determine a winner, present
 the unresolved choice. Do not count votes, equate confidence with probability, or
 combine incompatible plans merely to include both authors.
+
+Describe the peer's contribution by comparing the saved first and final answers.
+Do not credit the peer with a conclusion already present. Distinguish discovering
+a problem from verifying it: a check devised after a finding is not a pre-existing
+control. Record unsupported criticism and regressions as well as useful corrections.
 
 ## Records and stopping
 

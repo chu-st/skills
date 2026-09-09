@@ -35,6 +35,7 @@ Supporting evidence: [sources]
 Find consequential factual errors, unsupported inferences, missing evidence,
 alternatives, or failure scenarios. Zero findings is acceptable. For each finding
 give the exact claim, evidence or counterexample, impact, and a proposed correction.
+Critique the actual claim without strengthening it. Do not invent rejected objections.
 Label untested concerns and preferences explicitly. Do not modify or publish anything.
 Return a concise review and name the checks you could not perform.
 ```
@@ -47,5 +48,7 @@ The model had [source and tool access].
 [paste the full answer, preserving citations and limitations]
 
 Use dual-model-review to check its material findings against the original evidence,
-revise the answer, and explain what changed and what remains unresolved.
+revise the answer, and verify that accepted corrections survive in the final text.
+Compare with the saved first answer: what changed, what criticism was rejected,
+and what remains unresolved. Do not credit the peer with conclusions already present.
 ```

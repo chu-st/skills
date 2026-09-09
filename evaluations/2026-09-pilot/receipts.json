@@ -1,0 +1,155 @@
+[
+  {
+    "execution_status": "PASS",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "claude",
+    "requested_model": "opus",
+    "reported_model": "claude-opus-5",
+    "input_sha256": "94d0a5da0d3e36a57c8a8ff0bac3bfd948d7beeb27cbad61291d28a2a08cb82e",
+    "response_sha256": "300dcd76f2924eeac886fd46f4455f437df66e1fcc6f003005015e60dc04633b",
+    "elapsed_seconds": 49.016,
+    "usage": {
+      "source": "claude.result",
+      "tokens": {
+        "input_tokens": 2,
+        "output_tokens": 3194,
+        "cache_creation_input_tokens": 5102,
+        "cache_read_input_tokens": 2365
+      },
+      "reported_cost_usd": 0.13625549999999997
+    },
+    "case": "education",
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "response_file": "outputs/education-claude.md"
+  },
+  {
+    "execution_status": "PASS",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "codex",
+    "requested_model": "gpt-5.6-sol",
+    "reported_model": null,
+    "input_sha256": "94d0a5da0d3e36a57c8a8ff0bac3bfd948d7beeb27cbad61291d28a2a08cb82e",
+    "response_sha256": "2efb4e31d2bf236b88bb57b97f4ad7c7c5ab6bb95a8b15b82d9079ab0870ba43",
+    "elapsed_seconds": 36.031,
+    "usage": {
+      "source": "codex.turn.completed",
+      "tokens": {
+        "input_tokens": 17219,
+        "cached_input_tokens": 10752,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 878,
+        "reasoning_output_tokens": 145
+      }
+    },
+    "case": "education",
+    "observed_item_types": {
+      "agent_message": 1
+    },
+    "response_file": "outputs/education-codex.md"
+  },
+  {
+    "execution_status": "PASS",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "claude",
+    "requested_model": "opus",
+    "reported_model": "claude-opus-5",
+    "input_sha256": "b9a32e09628efc1c4478e2fe3458fad6bdb83d412e639d81607e778e09965b98",
+    "response_sha256": "995ba5245cbd8a4c4623e8c65df2164be1ffd2c2864cd8797cb647c7454fdca6",
+    "elapsed_seconds": 70.953,
+    "usage": {
+      "source": "claude.result",
+      "tokens": {
+        "input_tokens": 2,
+        "output_tokens": 4376,
+        "cache_creation_input_tokens": 5388,
+        "cache_read_input_tokens": 2365
+      },
+      "reported_cost_usd": 0.1690045
+    },
+    "case": "support",
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "response_file": "outputs/support-claude.md"
+  },
+  {
+    "execution_status": "PASS",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "codex",
+    "requested_model": "gpt-5.6-sol",
+    "reported_model": null,
+    "input_sha256": "b9a32e09628efc1c4478e2fe3458fad6bdb83d412e639d81607e778e09965b98",
+    "response_sha256": "297211aaa1a8504da504c5e04e266bed01a6a4b855f4dfb7eda4181f4cde2d40",
+    "elapsed_seconds": 46.625,
+    "usage": {
+      "source": "codex.turn.completed",
+      "tokens": {
+        "input_tokens": 17386,
+        "cached_input_tokens": 10752,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1139,
+        "reasoning_output_tokens": 241
+      }
+    },
+    "case": "support",
+    "observed_item_types": {
+      "agent_message": 1
+    },
+    "response_file": "outputs/support-codex.md"
+  },
+  {
+    "execution_status": "NOT RUN",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "claude",
+    "requested_model": "opus",
+    "reported_model": null,
+    "input_sha256": "2a853ceba625df83a076c4b4887076c6eaaa43dc356d53bc8d2dc37d8b92e1d8",
+    "response_sha256": null,
+    "elapsed_seconds": 3.297,
+    "usage": {
+      "source": "claude.result",
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "reported_cost_usd": 0
+    },
+    "case": "synthesis-control",
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "unavailable_reason": "Claude account session limit; provider announced reset at 13:00 Europe/Moscow. No retry or substitute."
+  },
+  {
+    "execution_status": "PASS",
+    "quality_verdict": "NOT ASSESSED",
+    "provider": "codex",
+    "requested_model": "gpt-5.6-sol",
+    "reported_model": null,
+    "input_sha256": "2a853ceba625df83a076c4b4887076c6eaaa43dc356d53bc8d2dc37d8b92e1d8",
+    "response_sha256": "6441c0fe519f5598902aeb871777891767670ad9c07d2d47d16a263c8a7170da",
+    "elapsed_seconds": 25.593,
+    "usage": {
+      "source": "codex.turn.completed",
+      "tokens": {
+        "input_tokens": 17066,
+        "cached_input_tokens": 10752,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 462,
+        "reasoning_output_tokens": 108
+      }
+    },
+    "case": "synthesis-control",
+    "observed_item_types": {
+      "agent_message": 1
+    },
+    "response_file": "outputs/synthesis-control-codex.md"
+  }
+]

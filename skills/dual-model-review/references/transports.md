@@ -49,6 +49,9 @@ and stderr are saved while the process runs. Stdin is closed after the brief;
 stdout is never truncated in the launch pipeline. Empty responses, CLI failures,
 timeouts and invalid provider envelopes are NOT RUN. Existing output folders are
 not overwritten. A successful receipt only verifies delivery of a response.
+Receipts retain available provider token counters and reported cost. Missing usage
+is unknown. Counter definitions, caching and dollar costs differ by provider;
+do not equate them with comparable compute or an actual bill.
 
 Codex uses `exec --ephemeral --ignore-user-config --sandbox read-only` with a
 new call directory. This avoids loading user-configured connectors but is not a

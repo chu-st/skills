@@ -2,7 +2,7 @@
 name: dual-model-review
 description: "Independently investigate a question or check a research report, decision, plan, document, or code with a second model chosen by the user. Supports Claude, Codex, other agents, and manual exchange between chats. Use when the user requests two-model review, a second opinion, cross-checking, or independent challenge."
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "CHU.ST · Чувство управления"
 ---
 
@@ -61,13 +61,15 @@ for the full exchange and finding contract. Templates are in
    reproducible calculation/test, then relevant primary sources. An attractive
    explanation or two agreeing models cannot substitute for evidence. Distinguish
    a found error from an untested concern. Reject unsupported criticism explicitly.
-5. Revise the answer. Keep resolved changes and unresolved uncertainties visible.
+5. Revise the answer. Check that accepted corrections and qualifications survive
+   in the final version, including claims added during synthesis.
    Do not merge incompatible recommendations. If priorities decide a trade-off,
    explain it or return that choice to the user. Stop when the agreed budget is
    exhausted or further exchange is unlikely to change the decision.
-6. Return the useful answer first, then a compact account of what the second model
-   changed, what was verified, what remains uncertain, and which model actually
-   participated. If access failed, state that the two-model review was NOT RUN.
+6. Return the useful answer first, then a compact comparison with the saved first
+   answer: what the second model changed, what was rejected, what remains uncertain,
+   and which model actually participated. If access failed, state that the
+   two-model review was NOT RUN.
 
 ## Reliability boundaries
 

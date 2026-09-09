@@ -119,6 +119,32 @@ class PeerTests(unittest.TestCase):
             peer.extract_response('codex', output)
 
 
+    def test_usage_preserves_provider_units_and_zero(self):
+        output = self.root / 'usage'
+        output.mkdir()
+        (output / 'stdout.log').write_text(json.dumps({
+            'usage': {'input_tokens': 0, 'cache_read_input_tokens': 120, 'output_tokens': 9},
+            'total_cost_usd': 0.02}), encoding='utf-8')
+        usage = peer.extract_usage('claude', output)
+        self.assertEqual(usage['tokens'], {'input_tokens': 0, 'output_tokens': 9,
+                                         'cache_read_input_tokens': 120})
+        self.assertEqual(usage['reported_cost_usd'], 0.02)
+        (output / 'stdout.log').write_text(json.dumps({'type': 'turn.completed', 'usage': {
+            'input_tokens': 100, 'cached_input_tokens': 60, 'output_tokens': 10}}), encoding='utf-8')
+        usage = peer.extract_usage('codex', output)
+        self.assertEqual(usage['tokens']['input_tokens'], 100)
+        self.assertEqual(usage['tokens']['cached_input_tokens'], 60)
+        self.assertNotIn('reported_cost_usd', usage)
+
+    def test_usage_missing_or_invalid_stays_unknown(self):
+        output = self.root / 'unknown-usage'
+        output.mkdir()
+        for content in ['bad json', '[]', '{"usage":null}',
+                        '{"usage":{"input_tokens":true,"output_tokens":-1}}']:
+            (output / 'stdout.log').write_text(content, encoding='utf-8')
+            self.assertIsNone(peer.extract_usage('claude', output))
+
+
 class InstallerTests(unittest.TestCase):
     def test_install_drift_backup_and_exact_update(self):
         with tempfile.TemporaryDirectory() as tmp:
