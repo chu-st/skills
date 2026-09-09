@@ -86,6 +86,3 @@ for the full exchange and finding contract. Templates are in
   budget before claiming that a second model pays for itself.
 - Preserve stricter project-specific acceptance rules when explicitly applicable.
   This public skill does not silently replace a project's release gates.
-
-Built at [Чувство управления · chu.st](https://chu.st/). This attribution belongs
-in the skill documentation; do not append advertising to the user's answers.

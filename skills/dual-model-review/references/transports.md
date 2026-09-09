@@ -37,15 +37,12 @@ available; aliases can resolve differently over time.
 
 ## Installation and troubleshooting
 
-Authenticate through each provider's own CLI. The helper does not ask for API
-keys or read credential files. Charges and subscription limits remain those of
-the selected provider. It sends exactly the brief supplied to it; include needed
+Authenticate through each provider's own CLI. Include needed
 source text explicitly, since the peer is not expected to discover project files.
 
 Executable discovery uses an explicit `--executable` path first, then
 `CHUST_CLAUDE_BIN` / `CHUST_CODEX_BIN`, then PATH. Use a native executable; Windows `.cmd` and `.bat`
-wrappers are refused to avoid interpreting data as shell syntax. No fixed user
-directory or private installation path is baked into this package.
+wrappers are refused to avoid interpreting data as shell syntax.
 
 Use `--timeout 300` to change the default five-minute call budget. Full stdout
 and stderr are saved while the process runs. Stdin is closed after the brief;
