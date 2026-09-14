@@ -2,7 +2,7 @@
 name: dual-model-review
 description: "Independently investigate a question or check a research report, decision, plan, document, or code with a second model chosen by the user. Supports Claude, Codex, other agents, and manual exchange between chats. Use when the user requests two-model review, a second opinion, cross-checking, or independent challenge."
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   author: "CHU.ST · Чувство управления"
 ---
 
@@ -57,7 +57,8 @@ for the full exchange and finding contract. Templates are in
    identify the claim, evidence/counterexample, consequence, and proposed change.
    For empirical statements require a source or check; for recommendations expose
    assumptions, competing explanations, and a plausible failure scenario.
-4. Verify disagreements using the strongest available evidence: direct observation,
+4. Verify disagreements and decision-critical claims on which both models agree
+   using the strongest available evidence: direct observation,
    reproducible calculation/test, then relevant primary sources. An attractive
    explanation or two agreeing models cannot substitute for evidence. Distinguish
    a found error from an untested concern. Reject unsupported criticism explicitly.

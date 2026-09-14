@@ -49,13 +49,16 @@ a quota or hide material findings in an appendix nobody reviews.
 Critique the claim actually made, without strengthening it to refute it. Report
 only criticism actually raised; do not invent rejected objections to fill a section.
 
-## Resolving disagreement
+## Verifying decisive claims and resolving disagreement
 
 Apply the user's constraints first; establish facts with primary evidence or
 reproduction. For designs and decisions, evaluate criteria, costs, alternatives,
 reversibility, and failure conditions. If these do not determine a winner, present
 the unresolved choice. Do not count votes, equate confidence with probability, or
 combine incompatible plans merely to include both authors.
+
+Check the decisive shared premises too. Trace a claim that drives the conclusion
+to the source or a reproducible calculation even when neither model objects to it.
 
 Describe the peer's contribution by comparing the saved first and final answers.
 Do not credit the peer with a conclusion already present. Distinguish discovering
@@ -68,7 +71,10 @@ Small chat tasks need only a brief and concise findings in the conversation. Lar
 tasks benefit from `brief.md`, `answer-a.md`, `answer-b.md`, `findings.md`, and
 `final.md`. Put these in the user's designated output location, never publish them
 automatically. CLI helper receipts record requested/reported model, exact argv,
-input/output hashes, timestamps, exit code, and execution status.
+input/output byte hashes, timestamps, exit code, execution status, and the model
+identity assessment. Hashes refer to the saved UTF-8 `input.md` and `response.md`
+files; verify their bytes without rewriting line endings. The receipt describes
+the helper's submitted brief, not an unchanged copy of the original source file.
 
 Stop at sufficient evidence, no remaining material disagreements, the budget limit,
 or a real access blocker. Preserve partial results and tell the user what remains.

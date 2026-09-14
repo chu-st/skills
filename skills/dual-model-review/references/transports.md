@@ -43,15 +43,34 @@ source text explicitly, since the peer is not expected to discover project files
 Executable discovery uses an explicit `--executable` path first, then
 `CHUST_CLAUDE_BIN` / `CHUST_CODEX_BIN`, then PATH. Use a native executable; Windows `.cmd` and `.bat`
 wrappers are refused to avoid interpreting data as shell syntax.
+On Windows, inspect `Get-Command claude -All` / `Get-Command codex -All` or the
+provider's official installation instructions to locate its native executable;
+pass its absolute path with `--executable`.
 
 Use `--timeout 300` to change the default five-minute call budget. Full stdout
 and stderr are saved while the process runs. Stdin is closed after the brief;
 stdout is never truncated in the launch pipeline. Empty responses, CLI failures,
 timeouts and invalid provider envelopes are NOT RUN. Existing output folders are
 not overwritten. A successful receipt only verifies delivery of a response.
+Read the printed model identity assessment as well as `execution_status`:
+
+- `MATCH`: the requested and reported identifiers are identical.
+- `FAMILY_MATCH`: a Claude `opus`, `sonnet`, or `haiku` alias matches the reported
+  family. This does not verify the current alias resolution or an exact version.
+- `UNVERIFIED`: identity was absent, ambiguous, or an alias could not be resolved.
+- `MISMATCH`: the reported model conflicts with the requested ID or Claude family.
+  The helper exits with code 2 and `NOT RUN`, preserving the received answer for inspection.
+
+An unverified identity may accompany successful delivery; it is not a verified
+model pairing. Use a concrete model ID when exact matching is required. A bare
+command adapter cannot establish identity from answer text. Usage mentioning
+several models is not resolved by picking the one with the most output tokens.
 Receipts retain available provider token counters and reported cost. Missing usage
 is unknown. Counter definitions, caching and dollar costs differ by provider;
 do not equate them with comparable compute or an actual bill.
+Reported counters, including zero, are retained for failed calls too: failure can
+still incur usage. `usage.result_status` records the provider envelope's status
+when available; interpret it together with the receipt's execution status.
 
 Codex uses `exec --ephemeral --ignore-user-config --sandbox read-only` with a
 new call directory. This avoids loading user-configured connectors but is not a
@@ -69,7 +88,10 @@ Create a local JSON file containing an argument array, not a shell command:
 ```
 
 Then use `--provider command --model <id> --command-file adapter.json`. The adapter
-must accept the brief on stdin and write only the answer on stdout. Configure
+must accept the brief on stdin and write only the answer on stdout. Use
+absolute paths for script and resource arguments: the child process runs in the
+new output directory, not beside the adapter file or in the caller's directory.
+The adapter's executable is resolved before that directory change. Configure
 the provider's noninteractive, tool-access and permission flags explicitly; this
 generic adapter cannot enforce another tool's policy. `{model}` substitution is
 required so the requested model is not silently ignored. Verify provider identity
