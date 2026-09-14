@@ -59,5 +59,10 @@ python scripts/install.py --agent both --replace
 [Codex](https://learn.chatgpt.com/docs/codex-cli).
 Python 3.10+ нужен только для помощника запуска.
 
+На Windows помощнику нужен родной исполняемый файл, а не `.cmd`-обёртка.
+Посмотрите `Get-Command claude -All` или `Get-Command codex -All`. Если команда
+указывает только на обёртку, найдите родной файл по официальной инструкции
+установки провайдера и передайте полный путь через `--executable`.
+
 Вторая модель выбирается в промпте или параметром `--model`; её имя не зашито в метод.
 Команды и способы подключения других моделей — в [описании транспорта](../skills/dual-model-review/references/transports.md).
