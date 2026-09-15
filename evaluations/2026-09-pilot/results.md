@@ -96,6 +96,9 @@ The frozen prompts above preserve the version actually exercised.
 This was two selected cases and one constructed control, not a complete experiment
 in two-model effectiveness. The review calls combine critique and revision; they
 do not independently test a host integrating a real peer response in every case.
+Every prompt also carried the full skill text and no arm ran without it, so the
+control shows that the instructed behaviour is reachable, not that these
+instructions produced it.
 No human usefulness rating, blinded evaluation, population error estimate or
 repeated-sampling uncertainty is available.
 

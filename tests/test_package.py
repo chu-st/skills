@@ -316,6 +316,14 @@ class PackageTests(unittest.TestCase):
                 if target:
                     self.assertTrue((path.parent / target).exists(), f'{path}: broken link {target}')
 
+    def test_declared_versions_agree(self):
+        """A hand-edited version in one file must not silently outrun the other."""
+        skill = (ROOT / 'skills/dual-model-review/SKILL.md').read_text(encoding='utf-8-sig')
+        declared = re.search(r'^\s*version:\s*"([^"]+)"', skill, re.M)
+        self.assertIsNotNone(declared, 'SKILL.md declares no version')
+        plugin = json.loads((ROOT / '.codex-plugin/plugin.json').read_text(encoding='utf-8-sig'))
+        self.assertEqual(declared.group(1), plugin['version'])
+
     def test_research_control_arithmetic(self):
         ai = (900 * 8 + 100 * 40) / 1000
         plain = (100 * 6 + 900 * 35) / 1000
