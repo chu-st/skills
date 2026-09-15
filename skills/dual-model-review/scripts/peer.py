@@ -131,16 +131,19 @@ def model_identity(provider, requested, reported):
     """Compare reported identity conservatively; an alias is not a resolved ID."""
     if not reported:
         return {"status": "UNVERIFIED", "basis": "No unambiguous model identity was reported"}
-    family_aliases = {"opus", "sonnet", "haiku"}
-    if provider == "claude" and requested in family_aliases:
-        family = re.match(r"^claude-(?:[0-9]+(?:-[0-9]+)*-)?(opus|sonnet|haiku)(?:-|$)", reported)
+    # The family is read out of the reported ID, so a new Claude family needs no code change.
+    family = (re.match(r"^claude-(?:[0-9]+(?:-[0-9]+)*-)?([a-z]+)(?:-|$)", reported)
+              if provider == "claude" else None)
+    if family and requested == family.group(1):
+        return {"status": "FAMILY_MATCH",
+                "basis": "Reported Claude family matches; the alias's exact version is not verified"}
+    # This list only sharpens the negative verdict: it marks bare words that are known family
+    # aliases rather than placeholders. An unlisted alias degrades to UNVERIFIED, never to a match.
+    if provider == "claude" and requested in {"opus", "sonnet", "haiku", "fable"}:
         if family:
-            matches = family.group(1) == requested
-            return {"status": "FAMILY_MATCH" if matches else "MISMATCH",
-                    "basis": "Reported Claude family matches; the alias's exact version is not verified"
-                    if matches else "Reported Claude family differs from the requested family"}
+            return {"status": "MISMATCH", "basis": "Reported Claude family differs from the requested family"}
         return {"status": "UNVERIFIED", "basis": "The Claude alias was not resolved to a recognizable model ID"}
-    known_id = r"^(?:claude-(?:[0-9]+(?:-[0-9]+)*-)?(?:opus|sonnet|haiku)-[0-9]|gpt-[0-9]|o[0-9](?:-|$))"
+    known_id = r"^(?:claude-(?:[0-9]+(?:-[0-9]+)*-)?[a-z]+-[0-9]|gpt-[0-9]|o[0-9](?:-|$))"
     if not re.match(known_id, requested) or not re.match(known_id, reported):
         return {"status": "UNVERIFIED", "basis": "Unknown alias or model ID; compare with the provider's diagnostics"}
     if requested == reported:

@@ -2,7 +2,7 @@
 name: dual-model-review
 description: "Independently investigate a question or check a research report, decision, plan, document, or code with a second model chosen by the user. Supports Claude, Codex, other agents, and manual exchange between chats. Use when the user requests two-model review, a second opinion, cross-checking, or independent challenge."
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
   author: "CHU.ST · Чувство управления"
 ---
 
