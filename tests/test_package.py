@@ -187,6 +187,18 @@ class PeerTests(unittest.TestCase):
             with self.subTest(provider=provider, requested=requested, reported=reported):
                 self.assertEqual(peer.model_identity(provider, requested, reported)['status'], status)
 
+    def test_unlisted_model_families_do_not_need_a_code_change(self):
+        """A new family must still verify; the code must not carry a model catalogue."""
+        cases = [('claude', 'fable', 'claude-fable-5-1', 'FAMILY_MATCH'),
+                 ('claude', 'claude-fable-5-1', 'claude-fable-5-1', 'MATCH'),
+                 ('claude', 'fable', 'claude-opus-5', 'MISMATCH'),
+                 ('claude', 'nova', 'claude-nova-1', 'FAMILY_MATCH'),
+                 ('claude', 'claude-nova-1', 'claude-nova-1', 'MATCH'),
+                 ('codex', 'gpt-7.2-pro', 'gpt-7.2-pro', 'MATCH')]
+        for provider, requested, reported, status in cases:
+            with self.subTest(provider=provider, requested=requested, reported=reported):
+                self.assertEqual(peer.model_identity(provider, requested, reported)['status'], status)
+
     def test_executable_path_survives_changing_child_directory(self):
         fake = self.root / 'fake-native.exe'
         fake.write_bytes(b'fixture')

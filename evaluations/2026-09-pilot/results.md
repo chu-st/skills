@@ -15,6 +15,13 @@ prompt text within each case, with source summaries and instructions included:
 [support](support/prompt.txt), [education](education/prompt.txt),
 [constructed synthesis control](synthesis-control.txt).
 
+The two cases differ in origin, and the difference is deliberate. The support draft
+reasons over synthetic data. The education draft is a verbatim excerpt from the
+author's own unpublished product research, published with consent because its two
+defects are authentic rather than planted; see its
+[provenance note](education/README.md). Read the education excerpt as real internal
+material, not as an invented example.
+
 | Case | Reviewer requested | Relation to declared draft author | Execution | Seconds | Response |
 |---|---|---|---|---:|---|
 | Support | Codex `gpt-5.6-sol` | Same | PASS | 46.63 | [Read](outputs/support-codex.md) |

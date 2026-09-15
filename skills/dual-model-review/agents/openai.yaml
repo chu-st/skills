@@ -1,4 +1,4 @@
 interface:
-  display_name: "Двухмодельная проверка · chu.st"
-  short_description: "Исследования и решения с выбранной второй моделью"
-  default_prompt: "Используй $dual-model-review для независимого исследования вопроса; вторую модель я укажу в запросе."
+  display_name: "Dual-model review · chu.st"
+  short_description: "Research and decisions with a second model you choose"
+  default_prompt: "Use $dual-model-review to investigate this question independently; I will name the second model in my request."
