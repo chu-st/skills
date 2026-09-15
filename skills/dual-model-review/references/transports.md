@@ -55,8 +55,9 @@ not overwritten. A successful receipt only verifies delivery of a response.
 Read the printed model identity assessment as well as `execution_status`:
 
 - `MATCH`: the requested and reported identifiers are identical.
-- `FAMILY_MATCH`: a Claude `opus`, `sonnet`, or `haiku` alias matches the reported
-  family. This does not verify the current alias resolution or an exact version.
+- `FAMILY_MATCH`: a Claude alias matches the family named in the reported ID. The
+  family is read out of that ID, so a newly released family needs no code change.
+  This does not verify the current alias resolution or an exact version.
 - `UNVERIFIED`: identity was absent, ambiguous, or an alias could not be resolved.
 - `MISMATCH`: the reported model conflicts with the requested ID or Claude family.
   The helper exits with code 2 and `NOT RUN`, preserving the received answer for inspection.
@@ -65,6 +66,9 @@ An unverified identity may accompany successful delivery; it is not a verified
 model pairing. Use a concrete model ID when exact matching is required. A bare
 command adapter cannot establish identity from answer text. Usage mentioning
 several models is not resolved by picking the one with the most output tokens.
+An identifier the helper cannot recognize as a model ID, such as `default` or a
+team alias, stays `UNVERIFIED` even when both sides report the same word: an echoed
+placeholder is not evidence of which model answered.
 Receipts retain available provider token counters and reported cost. Missing usage
 is unknown. Counter definitions, caching and dollar costs differ by provider;
 do not equate them with comparable compute or an actual bill.
@@ -78,6 +82,11 @@ proof of file confidentiality: respect the host sandbox and pass only authorized
 input. Claude uses safe mode with tools disabled. These flags require CLI versions
 that support them; inspect `--help` if an older CLI rejects a flag. Never fix an
 access failure by disabling security or silently switching models.
+
+The helper also reads each provider's machine-readable envelope: Claude's result
+object and Codex's turn events. A provider may change that format. The call then
+ends as NOT RUN with the raw logs preserved, never as a silently degraded answer;
+update the package rather than parsing around the change.
 
 ## Other CLI models
 
