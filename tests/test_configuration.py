@@ -34,7 +34,8 @@ def profile():
 class ConfigurationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        # Hosted Windows runners may expose TEMP through an 8.3 path alias.
+        self.root = Path(self.tmp.name).resolve()
         self.user = self.root / "user/review.json"
         self.env = mock.patch.dict(os.environ, {}, clear=True)
         self.env.start()
