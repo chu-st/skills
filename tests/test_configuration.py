@@ -86,6 +86,28 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(config.plan(value, 2)["participants"], 2)
         self.assertEqual(value["default_participants"], 3)
 
+    def test_known_current_host_fills_an_unspecified_orchestrator(self):
+        value = config.empty_profile()
+        host = role("openai", "Codex")
+        peer = role("anthropic", "Claude Code", "fable")
+        result = config.plan(value, overrides={"second": peer}, host=host)
+        self.assertEqual(result["selection_status"], "READY_TO_CHECK_ACCESS")
+        self.assertEqual(result["roles"]["orchestrator"], host)
+        self.assertTrue(result["host_default_applied"])
+        self.assertEqual(result["identity_status"], "NOT CHECKED")
+        self.assertIsNone(value["roles"]["orchestrator"])
+
+    def test_host_hint_does_not_replace_a_selected_or_explicitly_cleared_role(self):
+        value = profile()
+        host = role("openai", "Codex")
+        result = config.plan(value, host=host)
+        self.assertFalse(result["host_default_applied"])
+        self.assertEqual(result["roles"]["orchestrator"], value["roles"]["orchestrator"])
+        cleared = config.plan(value, overrides={"orchestrator": None}, host=host)
+        self.assertEqual(cleared["missing_roles"], ["orchestrator"])
+        selected = config.plan(value, overrides={"orchestrator": role("future", "Runner")}, host=host)
+        self.assertEqual(selected["roles"]["orchestrator"]["provider"], "future")
+
     def test_missing_third_does_not_downgrade_three(self):
         value = profile()
         value["roles"]["third"] = None
@@ -189,6 +211,46 @@ class ConfigurationTests(unittest.TestCase):
         self.save(self.user, profile())
         self.assertEqual(config.select_path(project=project, for_write=True)[0],
                          project / ".chust-review.json")
+
+    def test_project_creation_outranks_env_but_read_precedence_is_unchanged(self):
+        project = self.root / "project"
+        project.mkdir()
+        personal = self.save(self.root / "personal.json", profile())
+        os.environ["CHUST_REVIEW_CONFIG"] = str(personal)
+        destination, _ = config.select_path(project=project, for_write=True)
+        self.assertEqual(destination, project / ".chust-review.json")
+        config.initialize(destination, config.empty_profile())
+        self.assertEqual(config.load_profile(project=project)[1], str(personal))
+        self.assertEqual(config.read_json(personal), profile())
+        explicit = self.root / "explicit.json"
+        self.assertEqual(config.select_path(explicit, project, for_write=True)[0], explicit)
+
+    def test_future_schema_error_survives_new_keys(self):
+        value = profile()
+        value.update(schema_version=2, future_field=True)
+        with self.assertRaisesRegex(ValueError, "Unsupported schema_version"):
+            config.validate(value)
+
+    def test_cli_host_hint_and_explicit_project_init(self):
+        project = self.root / "project"
+        project.mkdir()
+        personal = self.save(self.root / "personal.json", config.empty_profile())
+        original = personal.read_bytes()
+        env = {**os.environ, "PYTHONUTF8": "1", "CHUST_REVIEW_CONFIG": str(personal)}
+        initialized = subprocess.run([sys.executable, str(SCRIPT), "init", "--project", str(project)],
+                                     capture_output=True, text=True, encoding="utf-8", timeout=15, env=env)
+        self.assertEqual(initialized.returncode, 0, initialized.stderr)
+        self.assertTrue((project / ".chust-review.json").is_file())
+        host = self.save(self.root / "host.json", role("openai", "Codex"))
+        overrides = self.save(self.root / "roles.json", {"second": role("anthropic", "Claude Code", "fable")})
+        planned = subprocess.run([sys.executable, str(SCRIPT), "plan", "--host-file", str(host),
+                                  "--roles-file", str(overrides)], capture_output=True,
+                                 text=True, encoding="utf-8", timeout=15, env=env)
+        self.assertEqual(planned.returncode, 0, planned.stderr)
+        result = json.loads(planned.stdout)
+        self.assertTrue(result["host_default_applied"])
+        self.assertEqual(result["source"], str(personal))
+        self.assertEqual(personal.read_bytes(), original)
 
     def test_cli_roundtrip_and_nonzero_incomplete_plan(self):
         path = self.root / "preferences.json"

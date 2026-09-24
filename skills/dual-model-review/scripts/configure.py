@@ -41,10 +41,13 @@ def validate_role(role, value):
 
 
 def validate(profile):
-    if not isinstance(profile, dict) or set(profile) != set(empty_profile()):
-        raise ValueError("Expected schema_version, default_participants, require_distinct_providers, roles")
-    if type(profile["schema_version"]) is not int or profile["schema_version"] != 1:
+    if not isinstance(profile, dict):
+        raise ValueError("Expected a profile object")
+    if "schema_version" in profile and (type(profile["schema_version"]) is not int
+                                        or profile["schema_version"] != 1):
         raise ValueError("Unsupported schema_version; expected integer 1")
+    if set(profile) != set(empty_profile()):
+        raise ValueError("Expected schema_version, default_participants, require_distinct_providers, roles")
     if type(profile["default_participants"]) is not int or profile["default_participants"] not in (2, 3):
         raise ValueError("default_participants must be integer 2 or 3")
     if type(profile["require_distinct_providers"]) is not bool:
@@ -60,20 +63,27 @@ def user_path():
     return Path.home() / ".config/chust-skills/review.json"
 
 
+def project_path(project):
+    root = Path(project).expanduser().resolve()
+    if not root.is_dir():
+        raise ValueError(f"Project root is not a directory: {root}")
+    return root / ".chust-review.json"
+
+
 def select_path(explicit=None, project=None, for_write=False):
     if explicit is not None:
         return Path(explicit).expanduser().resolve(), True
+    # An explicit creation destination outranks the profile selected for reading.
+    if for_write and project is not None:
+        return project_path(project), True
     if "CHUST_REVIEW_CONFIG" in os.environ:
         value = os.environ["CHUST_REVIEW_CONFIG"]
         if not value.strip():
             raise ValueError("CHUST_REVIEW_CONFIG is empty")
         return Path(value).expanduser().resolve(), True
     if project is not None:
-        root = Path(project).expanduser().resolve()
-        if not root.is_dir():
-            raise ValueError(f"Project root is not a directory: {root}")
-        path = root / ".chust-review.json"
-        if for_write or path.exists():
+        path = project_path(project)
+        if path.exists():
             return path, True
     return user_path(), False
 
@@ -85,7 +95,7 @@ def load_profile(explicit=None, project=None):
     return validate(read_json(path)), str(path)
 
 
-def plan(profile, participants=None, overrides=None, allow_same_provider=False):
+def plan(profile, participants=None, overrides=None, allow_same_provider=False, host=None):
     effective = copy.deepcopy(validate(profile))
     if allow_same_provider:
         effective["require_distinct_providers"] = False
@@ -95,6 +105,11 @@ def plan(profile, participants=None, overrides=None, allow_same_provider=False):
         for role, value in overrides.items():
             validate_role(role, value)
             effective["roles"][role] = copy.deepcopy(value)
+    validate_role("current host", host)
+    host_default_applied = (host is not None and effective["roles"]["orchestrator"] is None
+                            and (overrides is None or "orchestrator" not in overrides))
+    if host_default_applied:
+        effective["roles"]["orchestrator"] = copy.deepcopy(host)
     count = effective["default_participants"] if participants is None else participants
     if type(count) is not int or count not in (2, 3):
         raise ValueError("participants must be integer 2 or 3")
@@ -110,6 +125,7 @@ def plan(profile, participants=None, overrides=None, allow_same_provider=False):
             if value["model"] and other["model"] and value["model"].casefold() == other["model"].casefold():
                 raise ValueError(f"{other_role} and {role} select the same model")
     return {"participants": count, "roles": active,
+            "host_default_applied": host_default_applied,
             "require_distinct_providers": effective["require_distinct_providers"],
             "selection_status": "NEEDS_CONFIGURATION" if missing else "READY_TO_CHECK_ACCESS",
             "missing_roles": missing, "access_status": "NOT CHECKED",
@@ -136,6 +152,7 @@ def main(argv=None):
         elif name == "plan":
             command.add_argument("--participants", type=int, choices=(2, 3))
             command.add_argument("--roles-file", help="Temporary whole-role replacements as JSON")
+            command.add_argument("--host-file", help="Known current host as one role record; fills an unspecified orchestrator")
             command.add_argument("--allow-same-provider", action="store_true",
                                  help="Task explicitly selects distinct models from one provider")
     args = parser.parse_args(argv)
@@ -151,8 +168,9 @@ def main(argv=None):
                 result = {"source": source, "profile": profile}
             else:
                 overrides = read_json(args.roles_file) if args.roles_file else None
+                host = read_json(args.host_file) if args.host_file else None
                 result = {"source": source, **plan(profile, args.participants, overrides,
-                                                  args.allow_same_provider)}
+                                                  args.allow_same_provider, host)}
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 2 if result.get("selection_status") == "NEEDS_CONFIGURATION" else 0
     except (OSError, ValueError) as exc:
