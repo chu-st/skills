@@ -37,8 +37,11 @@ class ConfigurationTests(unittest.TestCase):
         # Hosted Windows runners may expose TEMP through an 8.3 path alias.
         self.root = Path(self.tmp.name).resolve()
         self.user = self.root / "user/review.json"
-        self.env = mock.patch.dict(os.environ, {}, clear=True)
+        # Preserve SystemRoot and other runtime variables needed by Python 3.10
+        # on Windows; isolate only the skill's own configuration selector.
+        self.env = mock.patch.dict(os.environ, {}, clear=False)
         self.env.start()
+        os.environ.pop("CHUST_REVIEW_CONFIG", None)
         self.user_patch = mock.patch.object(config, "user_path", return_value=self.user)
         self.user_patch.start()
 
