@@ -1,10 +1,10 @@
 {
   "name": "chust-skills",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "repository": "https://github.com/chu-st/skills",
   "homepage": "https://chu.st/",
   "license": "MIT",
-  "description": "Independent research and review with a second model of your choice.",
+  "description": "Independent research and review with two or three models and configurable roles.",
   "author": {
     "name": "CHU.ST · Чувство управления",
     "email": "timsem@chu.st",
@@ -13,12 +13,12 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "CHU.ST Skills",
-    "shortDescription": "Research and decisions with a second model.",
-    "longDescription": "Independently investigate questions and verify findings with a user-selected second model. Supports Claude, Codex, other agent transports, and manual exchange between chats.",
+    "shortDescription": "Research with two or three chosen models.",
+    "longDescription": "Investigate questions and verify findings with configurable orchestrator, second, and third model roles. Supports available tools, Claude and Codex CLI transports, generic CLI adapters, and manual chat handoff including Gemini.",
     "developerName": "CHU.ST",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "Research this with a second model of my choice.",
+    "defaultPrompt": "Research this with two or three models using my preferred roles.",
     "websiteURL": "https://chu.st/"
   }
 }

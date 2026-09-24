@@ -1,4 +1,4 @@
 interface:
-  display_name: "Dual-model review · chu.st"
-  short_description: "Research and decisions with a second model you choose"
-  default_prompt: "Use $dual-model-review to investigate this question independently; I will name the second model in my request."
+  display_name: "Two- or three-model review · chu.st"
+  short_description: "Research and review with two or three chosen models"
+  default_prompt: "Use $dual-model-review with my configured roles, or help me choose two or three models for this task."

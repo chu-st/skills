@@ -1,8 +1,12 @@
-# Access to the second model
+# Access to the selected models
 
-The method is independent of the host agent. A prompt can request any second model;
+The method is independent of the host agent. A prompt can select two or three models;
 actual automatic execution requires an available connector, CLI, or API adapter
-for that model. Do not promise automatic access to every model from every app.
+for each selected product/model. Resolve the roles using
+[configuration.md](configuration.md) first. Do not promise automatic access to
+every model from every app. Check the orchestrator's access too when it is not the
+current host. The generic command adapter and manual handoff support other providers;
+there is no bundled native Gemini adapter in this version.
 
 ## Route selection
 
@@ -14,7 +18,29 @@ for that model. Do not promise automatic access to every model from every app.
 3. An explicitly configured external CLI can use the `command` adapter.
 4. Without such access, prepare a copyable handoff using the templates. The user
    pastes it into a fresh chat with the selected model and brings the actual answer
-   back. Until that answer arrives the second opinion is pending, not completed.
+   back. Until that answer arrives, that slot is pending / NOT RUN. Preserve product
+   preferences: a ChatGPT or Gemini web subscription is not proof of CLI/API access.
+   Do not silently change the roster when one route fails.
+
+## Three participants, Gemini, and other providers
+
+The orchestrator invokes the second and third separately with fresh contexts and
+the same frozen brief. Use a different output directory for each peer. First answers
+may be obtained in parallel if the environment permits it; sequential fresh calls
+also work. Do not pass the second's answer to the third before its first response.
+No peer should recursively launch more peers.
+
+For Gemini or another model, prefer the selected product's available connector;
+otherwise use a user-configured CLI adapter or a manual chat handoff. The `command`
+adapter below can launch a native executable (including a runtime plus an absolute
+script path) with literal argument arrays and stdin. Inspect that CLI's current
+official documentation and actual `--help` before configuring its noninteractive
+flags. Do not invent flags or promise a model based on a product name. Generic
+stdout is unverified; retain identity evidence from provider diagnostics separately.
+
+`configure.py plan` resolves preferences only. It neither runs these calls nor
+proves their availability. `peer.py` remains a one-peer transport; the skill's
+orchestrator coordinates the chosen number of calls.
 
 ## Claude → Codex
 
