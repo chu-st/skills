@@ -8,3 +8,4 @@ dist/
 *.log
 .install-backups/
 local-settings.json
+.chust-review.json

@@ -6,24 +6,37 @@ independence. A peer reviewing an existing draft necessarily sees that draft.
 
 ## Investigation
 
-1. The host writes a neutral brief and its own initial answer separately.
-2. The peer receives the brief and raw evidence, not the host's answer.
-3. Preserve both answers before exchanging them. Label them A and B when useful;
+1. The orchestrator writes a neutral brief and its own initial answer separately.
+2. Each peer receives the same brief and raw evidence, not anyone else's answer.
+3. Preserve all first answers before exchanging them. Label them A, B, C when useful;
    retain actual model identities in the execution record. Do not claim anonymity
    if the writing or tool interface reveals the author.
-4. The host checks B against evidence. If material disagreements remain, ask B to
-   challenge A using the same finding contract. A new focused request is preferred
-   to a sprawling debate. Stop at the declared budget, normally two peer calls.
+4. The orchestrator checks B (and C when selected) against evidence. If material
+   disagreements remain, send one focused follow-up to the peer best positioned
+   to resolve them, with the disputed claim and evidence, not a demand for consensus.
+   Normal budget: one first call per peer plus at most one follow-up in total.
 5. Resolve individual claims, then produce one answer. Agreement on a factual
    claim is strongest when supported by different independent evidence trails.
 
 ## Review
 
-Send the frozen artifact, original request, constraints, and acceptance criteria.
+Send each peer the same frozen artifact, request, constraints, and acceptance criteria.
 Request meaningful defects and counterexamples, not cosmetic edits or a mandatory
 number of criticisms. The host reproduces or checks findings before applying them.
 A peer's proposed command is not authorization to run it. For code or release work,
-use the project's existing acceptance checks on the final version.
+use the project's existing acceptance checks on the final version. Preserve both
+reviews before comparing them; do not show the second's review to the third first.
+
+## Adding a third later
+
+If the user adds a third after a two-model result, preserve the existing work and
+original first answers; record that the third joined after the initial exchange.
+Do not describe the whole earlier process as three independent participants.
+For a new independent answer, give the third only the original neutral brief and
+raw evidence. If the user instead wants it to judge an existing disagreement,
+send that disagreement and label the result **informed follow-up review**, not an
+independent third first answer. In either route, resolve claims with evidence;
+the third is not an arbiter whose vote overrules facts or the user's priorities.
 
 ## Finding contract
 
@@ -55,7 +68,8 @@ Apply the user's constraints first; establish facts with primary evidence or
 reproduction. For designs and decisions, evaluate criteria, costs, alternatives,
 reversibility, and failure conditions. If these do not determine a winner, present
 the unresolved choice. Do not count votes, equate confidence with probability, or
-combine incompatible plans merely to include both authors.
+combine incompatible plans merely to include every author. A minority finding
+with stronger evidence can overturn two agreeing models.
 
 Check the decisive shared premises too. Trace a claim that drives the conclusion
 to the source or a reproducible calculation even when neither model objects to it.
@@ -67,8 +81,18 @@ control. Record unsupported criticism and regressions as well as useful correcti
 
 ## Records and stopping
 
+Keep a compact roster: role, requested product/model, reported model, identity
+evidence, access route, response status, and contribution. Count the orchestrator
+as one participant; count no simulated roles or duplicate underlying models.
+Delivery PASS does not establish identity or overall completion. If any requested
+slot is missing, mismatched, or unverified, the requested roster is incomplete;
+report verified partial results and the affected slots separately. A completed
+two-model subset does not satisfy an explicit three-model request. A manual reply
+can be examined even with unverified identity; label that limitation instead of
+discarding useful evidence or presenting the requested roster as verified.
+
 Small chat tasks need only a brief and concise findings in the conversation. Larger
-tasks benefit from `brief.md`, `answer-a.md`, `answer-b.md`, `findings.md`, and
+tasks benefit from `brief.md`, `answer-a.md`, `answer-b.md`, optionally `answer-c.md`, `findings.md`, and
 `final.md`. Put these in the user's designated output location, never publish them
 automatically. CLI helper receipts record requested/reported model, exact argv,
 input/output byte hashes, timestamps, exit code, execution status, and the model
