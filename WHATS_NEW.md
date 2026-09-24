@@ -1,6 +1,33 @@
-# What's new — 0.3.0
+# What's new
 
-## По-русски
+## 0.3.1 — исправления после ревью Claude Fable
+
+- **Текущий агент как оркестратор:** `plan --host-file` принимает сведения о текущем
+  приложении и модели, когда оркестратор не задан. Сохранённая или явно выбранная
+  роль не подменяется; помощник не угадывает модель.
+- **Проектный профиль создаётся в указанном проекте.** `init --project` больше не
+  перенаправляется переменной `CHUST_REVIEW_CONFIG`. Приоритеты чтения прежние.
+- **Уточнён протокол:** агент может передавать материалы выбранному оркестратору и
+  хранить ответы, не становясь дополнительным участником анализа. Проверка выбора
+  моделей явно отделена от проверки их фактической идентичности при запуске.
+- **Понятнее ошибка неизвестной схемы.** Новый номер версии распознаётся до проверки
+  набора полей.
+
+Изменения основаны на реальном ревью модели, которую провайдер сообщил как
+`claude-fable-5-1`. Два существенных замечания воспроизведены. Добавлены пять тестов,
+всего — 42. Объём ревью и ограничения — в [отчёте](docs/validation.md).
+
+**English:** A real Claude Fable review exposed two reproducible gaps. The plan
+helper now accepts a known current host for an unspecified orchestrator, without
+replacing selected roles. Explicit project creation now outranks the environment
+profile selector; read precedence is unchanged. Relay responsibilities, runtime
+identity checks, and future-schema diagnostics are clearer. Five regression tests
+were added. The model reviewed the original four core files, not the patched
+release; it did not run tests. No live three-model experiment is claimed.
+
+## 0.3.0
+
+### По-русски
 
 **Один скилл для двух- и трёхмодельной проверки.** Имя `dual-model-review`
 сохранено: переустанавливать его под новым именем не нужно.
@@ -34,7 +61,7 @@
 Проверки и их ограничения описаны в [отчёте о валидации](docs/validation.md).
 Инструкции: [настройка](docs/install.md), [формат профиля](skills/dual-model-review/references/configuration.md).
 
-## English
+### English
 
 The existing `dual-model-review` skill now supports two or three real participants:
 a configurable orchestrator, regular second model, and optional third. No provider

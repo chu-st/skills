@@ -2,7 +2,7 @@
 name: dual-model-review
 description: "Investigate questions or review research, decisions, plans, documents, and code with two or three real models selected by the user. Configure reusable model roles and verify consequential findings. Use for two-model or three-model review, a second opinion, independent challenge, or configuring this skill's model preferences."
 metadata:
-  version: "0.3.0"
+  version: "0.3.1"
   author: "CHU.ST · Чувство управления"
 ---
 
@@ -38,6 +38,9 @@ Distinguish the current host from the configured orchestrator. If they differ,
 hand off orchestration through available access or a copyable brief. Do not silently
 swap roles or claim to be the configured model. Do not add the host as a fourth
 participant. Preserve products too: ChatGPT access is not Codex/API access.
+The host may prepare and relay packets and store versions, replies, and receipts
+on the orchestrator's behalf. Substantive answers, adjudication, and final synthesis
+remain the selected orchestrator's work; relaying alone adds no model participant.
 
 Use real, distinct selected models, never simulated personas. Record requested and
 actually reported identities separately; a product label, launch flag, alias, or
