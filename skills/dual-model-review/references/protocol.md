@@ -24,8 +24,8 @@ Send each peer the same frozen artifact, request, constraints, and acceptance cr
 Request meaningful defects and counterexamples, not cosmetic edits or a mandatory
 number of criticisms. The host reproduces or checks findings before applying them.
 A peer's proposed command is not authorization to run it. For code or release work,
-use the project's existing acceptance checks on the final version. Preserve both
-reviews before comparing them; do not show the second's review to the third first.
+use the project's existing acceptance checks on the final version. Preserve all
+selected peer reviews before comparing them; do not show the second's review to the third first.
 
 ## Adding a third later
 

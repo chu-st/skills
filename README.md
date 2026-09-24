@@ -9,7 +9,7 @@
 аналитического вывода, плана, документа или кода. Один скилл поддерживает оба режима.
 
 [English](README.en.md) · [Начать без установки](prompts/start-ru.md) ·
-[Установка и настройка](docs/install.md) · [Что нового в 0.3.0](WHATS_NEW.md) · [Пример исследования](examples/research/README.md)
+[Установка и настройка](docs/install.md) · [Что нового в 0.3.1](WHATS_NEW.md) · [Пример исследования](examples/research/README.md)
 
 [Проверенный разбор примера](examples/research/worked-example.md) · [Что действительно проверено](docs/validation.md)
 

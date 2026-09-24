@@ -39,7 +39,17 @@ choice. Preserve unchanged roles. An explicit “two models” overrides a saved
 an explicit “three models” activates the third slot, never silently a spare model.
 Explicitly selecting distinct models from the same provider also overrides the
 provider-diversity preference for that task (`plan --allow-same-provider`); do not
-require the user to edit their saved defaults. It never allows duplicate models.
+require the user to edit their saved defaults. Duplicate underlying models remain
+ineligible: the helper rejects matching explicit selections; resolve aliases and
+unspecified models and check actual identities before counting participants.
+
+The helper cannot discover the current host's identity. For an unspecified
+orchestrator, the agent passes its known runtime product/model as one role record
+using `plan --host-file`, or includes that record in `--roles-file`. Do not ask the
+user to configure a host already established by the runtime. The host hint fills
+only a null orchestrator; it never replaces a configured or task-selected model.
+An explicit task override of `orchestrator: null` stays unresolved. Without a host
+record, a null orchestrator remains `NEEDS_CONFIGURATION`, not an invented identity.
 
 ## Profile format (schema 1)
 
@@ -75,8 +85,9 @@ Every non-null role has four fields:
   **within the specified product**; it does not allow replacing it with another app.
   None of these values claims that access exists or provides executable commands.
 
-The third may remain null for two-model use. An incomplete profile may be saved
-during setup, but missing active roles block a roster plan. The plan checks selection,
+The third may remain null for two-model use. A null orchestrator can use the known
+current host supplied by the agent as described above. An incomplete profile may be
+saved during setup, but other missing active roles block a roster plan. The plan checks selection,
 not availability or verified identities. Never report its `READY_TO_CHECK_ACCESS`
 status as a completed run.
 
@@ -88,15 +99,20 @@ Paths below are relative to the skill directory. Python 3.10+, standard library 
 python scripts/configure.py init
 python scripts/configure.py show
 python scripts/configure.py plan --participants 3
+python scripts/configure.py plan --host-file /path/to/current-host.json --roles-file /path/to/task-overrides.json
 python scripts/configure.py init --config /path/to/review.json --from-file /path/to/preferences.json
 python scripts/configure.py plan --config /path/to/review.json --roles-file /path/to/task-overrides.json --participants 2
 ```
 
-`init` creates the user profile by default, or the explicit/env destination. With
-`--project` it creates `.chust-review.json` there. Existing files are never replaced.
+For `init`, destination priority is explicit `--config`, explicit `--project`,
+`CHUST_REVIEW_CONFIG`, then the user path. Thus `init --project` creates
+`.chust-review.json` there even when the environment selects another profile for
+reading. `show` and `plan` keep the read precedence above. Existing files are never replaced.
 Edit the existing JSON for later updates, then run `show` or `plan` to validate.
 `--roles-file` is a JSON object containing only role names and their replacement
-records; it affects this plan only. The helper cannot switch the current host,
+records; it affects this plan only.
+`--host-file` contains one role record with provider, product, model, and transport;
+it is a runtime hint and is never saved into the profile. The helper cannot switch the current host,
 invoke models, or convert a chat subscription into CLI/API access. Without a shell,
 read and apply the same preferences in the conversation or an attached profile.
 
