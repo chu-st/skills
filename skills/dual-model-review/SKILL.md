@@ -1,8 +1,8 @@
 ---
 name: dual-model-review
-description: "Investigate questions or review research, decisions, plans, documents, and code with two or three real models selected by the user. Configure reusable model roles and verify consequential findings. Use for two-model or three-model review, a second opinion, independent challenge, or configuring this skill's model preferences."
+description: "Coordinate work, research, comparison, or review with two or three real models and configurable roles. Use for requests to run a task with multiple models, ask another model for a second opinion, or configure these preferences (прогон, исследование, работа двумя/тремя моделями). Supports short and full cycles. Ordinary research or comparing models as products alone does not request a multi-model run."
 metadata:
-  version: "0.3.1"
+  version: "0.4.0"
   author: "CHU.ST · Чувство управления"
 ---
 
@@ -17,9 +17,10 @@ decisions as well as technical work. A repository, Python, and CLI are optional.
 
 ## Configure and select participants
 
-For “configure my models”, “change the orchestrator”, or equivalent, use the
+For “show my models”, “configure my models”, “change the orchestrator”, or equivalent, use the
 **setup mode** in [configuration.md](references/configuration.md). Save preferences
-outside the installed skill; setup does not call models or run a review. Use the
+outside the installed skill; viewing or saving settings does not call models or run a review. An
+explicit access-check request is a separate action within its authorized scope. Use the
 same reference when loading preferences for a run. No provider is mandatory.
 
 - **Orchestrator:** owns the brief, checks evidence, resolves findings, and produces
@@ -30,8 +31,10 @@ same reference when loading preferences for a run. No provider is mandatory.
 
 Use explicit task choices before saved preferences. Two participants means
 orchestrator + second; three adds third. Without a saved count or explicit choice,
-use two. Merely configuring a third does not activate it. Announce the effective
-roster and count before calls. Resolve only choices needed for this run; do not
+use two. Merely configuring a third does not activate it. Select the cycle separately:
+task choice, then saved `default_cycle`, otherwise **short**. “Full” does not mean three;
+“three” does not mean full. Before calls, state the roster, cycle, expected peer rounds,
+and access limitations in plain language. Resolve only choices needed for this run; do not
 ask again for choices already supplied. Setup is optional.
 
 Distinguish the current host from the configured orchestrator. If they differ,
@@ -54,6 +57,22 @@ Do not silently substitute a model, change a product, or downgrade three to two.
 Keep the user's question, scope, constraints, and requested output. Resolve only
 missing choices that matter. If models were specified, use them exactly.
 
+Interpret ordinary wording in the user's language; no exact command phrase is required.
+Use the task context, not just the verb:
+
+| Request, including equivalent wording | Route |
+|---|---|
+| “Прогони / исследуй / сделай эту работу двумя / тремя моделями”, “in 2 / 3 models” | Explicit count; choose the work mode from the task and available artifact |
+| “Проверь готовый план второй моделью”, “ask another model” | Review with two, unless the context explicitly continues a selected three-model run |
+| “Сделай работу / подготовь план” with multiple models | Produce the requested deliverable; independent proposals or review as appropriate, not just a review report |
+| “Полный цикл / с взаимной критикой / как в презентации” | Full cycle with the selected count; ask what a referenced cycle means only if unavailable |
+| “Покажи / настрой модели / поменяй ведущую / поменяй местами” | Read or update preferences as requested; no task run implied |
+| “Добавь третью к прошлому прогону” | Preserve completed work; default to an independent answer on the original brief. Send an existing dispute only when requested; do not ask to choose again without a real ambiguity |
+
+A request to compare three model products, or ordinary “исследуй / проверь код” without
+multi-model context, does not itself select this method. Explicit task choices override
+defaults, including “only this time, two and short”; they do not persist automatically.
+
 Choose the smallest suitable mode:
 
 - **Investigate:** all selected models independently answer the same neutral brief
@@ -65,12 +84,21 @@ Choose the smallest suitable mode:
 - **Compare options:** each proposes options against the same criteria; compare
   assumptions and trade-offs, not just which option receives more votes.
 
+For creation or implementation, preserve the requested output and the project's
+acceptance checks. Designate who edits shared artifacts; independent proposals do not
+authorize concurrent edits or publication by peers.
+
 Solve directly checkable arithmetic or file facts with tools first. Do not expand
 a short second-opinion request into a large multi-agent project. Normal budget:
-one first response per peer (one call for two models, two for three), then at most
+in the **short** cycle, one first response per peer (one call for two models, two for three), then at most
 one focused follow-up **in total** for material issues. Calls may run in parallel
 when supported and authorized; otherwise keep fresh contexts sequentially.
-Extra rounds need a reason within the user's budget; agreement is not the objective.
+The **full** cycle adds mutual critique, author revisions, explicit resolution of
+material disagreements, synthesis and an independent
+check of the common draft; use the mode-specific sequence and budget in
+[protocol.md](references/protocol.md). Extra rounds need a reason within the user's
+budget; agreement is not the objective. An explicit full-cycle request authorizes its
+ordinary stages, subject to existing access, cost, and permission limits.
 
 For research, read [research.md](references/research.md). For model access, read
 [transports.md](references/transports.md). Use [protocol.md](references/protocol.md)
@@ -80,7 +108,7 @@ for the full exchange and finding contract. Templates are in
 ## Execute
 
 1. Freeze a brief: the exact question, supplied evidence and date, scope,
-   decision criteria, budget, all roles and selected products/models, and intended output. For a
+   decision criteria, cycle, budget, all roles and selected products/models, and intended output. For a
    changing artifact, identify the version. Files may be hashed; chats can use
    a quoted version and timestamp. A tool call is not required just to create IDs.
 2. Obtain real independent responses. In investigation mode, do not include
@@ -99,6 +127,8 @@ for the full exchange and finding contract. Templates are in
    reproducible calculation/test, then relevant primary sources. An attractive
    explanation or a two-to-one majority cannot substitute for evidence. Distinguish
    a found error from an untested concern. Reject unsupported criticism explicitly.
+   For unresolved material disputes, use [disagreements.md](references/disagreements.md):
+   turn competing positions into a useful check or a choice against the user's criteria.
 5. Revise the answer. Check that accepted corrections and qualifications survive
    in the final version, including claims added during synthesis.
    Do not merge incompatible recommendations. If priorities decide a trade-off,

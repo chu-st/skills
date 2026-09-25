@@ -1,21 +1,58 @@
 # Model preferences and setup
 
 This is a mode of `dual-model-review`, not a second skill and not a provider API.
-The agent can configure it conversationally; the optional `scripts/configure.py`
-helper creates, validates, and resolves a JSON profile without calling any models.
+The agent configures it conversationally; people need not edit JSON or learn CLI
+flags. The optional `scripts/configure.py` helper creates, updates, validates, and
+resolves a JSON profile without calling models.
 
 ## Setup conversation
 
-Use choices already stated by the user. Ask only for missing preferences: who
-orchestrates, who is second, an optional third, and whether the default count is
-two or three. If no count is requested, retain the existing count or use two.
+Read existing preferences and reuse choices already stated. Ask only for missing
+active roles; do not require a third for two-model use. If no count is requested,
+retain the existing count or use two. If no cycle is requested, retain it or use
+short. Three saved roles do not implicitly mean three active participants, and
+three participants do not implicitly mean a full cycle.
 Keep a selected model within a product when the user has not named a version;
 do not invent an exact ID. A product preference and a model identity are separate.
 
 Save only on a setup/update request. Ordinary task overrides are temporary unless
-the user asks to remember them. Summarize the saved roles, default count, and path.
+the user asks to remember them. “Next time” alone does not authorize a permanent
+default change; clarify duration only if necessary to act, or keep a one-run
+preference in the current conversation and state that scope.
 Saving a preference does not prove account access, authentication, or availability.
 Do not collect credentials. Never add a person's private profile to the public skill.
+
+| User action | Behavior |
+|---|---|
+| “Show my models / покажи настройки” | Read and summarize; do not save or invoke models |
+| “Configure / remember / by default / настрой / запомни” | Save the requested preferences; retain everything else |
+| “Swap Claude and ChatGPT / поменяй местами” during setup | Move the existing whole role records; preserve the third, count and cycle |
+| “Only this run, two and short / только сейчас” | Temporary choices; leave the profile unchanged |
+| “Configure and check access” | Save, then separately perform authorized access checks; do not ask for access-check consent again |
+
+If a product occurs in multiple roles or a replacement would create a duplicate
+active model, resolve that ambiguity rather than inventing a swap or model. A
+model selection such as “Pro” must be resolved to an available identifier within
+the chosen product; the explicit flag selects it but does not verify the served ID.
+
+After a change, validate the whole updated profile and show a compact summary in
+the user's language. For example:
+
+| Role | Selected product / model | Expected access / observation |
+|---|---|---|
+| Lead | User's selected app and model | Selected route; access not checked or last actual observation |
+| Second | User's selected app and model | Automatic tool/CLI available, manual handoff, or unknown |
+| Third (active / on request) | User's selection or not configured | Route and access status, separately |
+
+Then state the default count and short/full cycle, and one useful phrase such as
+“прогони в трёх моделях полным циклом”. Keep provider codes, JSON and paths secondary;
+name the actual save location briefly after a save. Do not present CLI/manual/auto
+as availability results. Expected route, observed access, and reported identity
+are distinct. If identity is missing, keep the useful response and label identity
+unverified; do not repeatedly ask to authorize a route already selected by the user.
+Read-only discovery may inform a summary; paid model calls are not implicit in setup.
+Use the user's authorized access route and obtain any required billing consent;
+failure of a subscription route does not authorize a paid fallback.
 
 ## Where the profile lives
 
@@ -57,6 +94,7 @@ record, a null orchestrator remains `NEEDS_CONFIGURATION`, not an invented ident
 {
   "schema_version": 1,
   "default_participants": 2,
+  "default_cycle": "short",
   "require_distinct_providers": true,
   "roles": {
     "orchestrator": {"provider": "anthropic", "product": "Claude", "model": "fable", "transport": "auto"},
@@ -73,6 +111,10 @@ the same provider. `require_distinct_providers` defaults to `true`; users can se
 to `false` for distinct models from one provider. The same underlying model in two
 sessions never becomes two models. Resolve aliases and check actual identities at
 execution, including collisions not visible in the profile.
+
+`default_cycle` is optional in schema 1 and is `short` when absent. It accepts
+`short` or `full`, independently of `default_participants`. Old profiles remain
+valid and are not rewritten on read. A task's explicit cycle overrides this default.
 
 Every non-null role has four fields:
 
@@ -99,16 +141,27 @@ Paths below are relative to the skill directory. Python 3.10+, standard library 
 python scripts/configure.py init
 python scripts/configure.py show
 python scripts/configure.py plan --participants 3
+python scripts/configure.py plan --participants 3 --cycle full
+python scripts/configure.py update --config /path/to/review.json --from-file /path/to/complete-revised-profile.json
 python scripts/configure.py plan --host-file /path/to/current-host.json --roles-file /path/to/task-overrides.json
 python scripts/configure.py init --config /path/to/review.json --from-file /path/to/preferences.json
 python scripts/configure.py plan --config /path/to/review.json --roles-file /path/to/task-overrides.json --participants 2
 ```
 
-For `init`, destination priority is explicit `--config`, explicit `--project`,
+For `init` and `update`, destination priority is explicit `--config`, explicit `--project`,
 `CHUST_REVIEW_CONFIG`, then the user path. Thus `init --project` creates
 `.chust-review.json` there even when the environment selects another profile for
-reading. `show` and `plan` keep the read precedence above. Existing files are never replaced.
-Edit the existing JSON for later updates, then run `show` or `plan` to validate.
+reading. `show` and `plan` keep the read precedence above. `init` never replaces an existing file.
+For later updates, the agent reads the existing profile, changes only the user's
+requested fields, and passes the complete revised object to `update --from-file`.
+To update the profile selected for reading, pass its resolved path as `--config`.
+An explicit `update --project` targets that project's existing file; if missing,
+it fails without changing a user/environment profile. `update` validates both profiles,
+saves a uniquely named backup beside it, and replaces it through a temporary file.
+It refuses a missing destination; use `init` for creation. An unchanged profile is
+left alone. Do not drop unmentioned preferences when building the replacement.
+Without the helper, apply the same read/modify/validate/save discipline through
+available file tools; JSON editing is the agent's task, not a required user step.
 `--roles-file` is a JSON object containing only role names and their replacement
 records; it affects this plan only.
 `--host-file` contains one role record with provider, product, model, and transport;
@@ -120,6 +173,9 @@ read and apply the same preferences in the conversation or an attached profile.
 
 Keep the `dual-model-review` name, installation paths, and existing `peer.py`
 commands. No configuration is required for an explicit two-model request.
+Older helpers may reject the new optional `default_cycle` key; use the updated
+helper for a profile that stores it. Backups are personal data too; keep them out
+of repositories (including custom profile names).
 Move any owner-specific policy out of a locally edited `SKILL.md` into the profile
 before replacing the installation. Back up that local version; do not transplant
 private provider rules into the public release. Existing run receipts remain valid.

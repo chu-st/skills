@@ -86,6 +86,138 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(config.plan(value, 2)["participants"], 2)
         self.assertEqual(value["default_participants"], 3)
 
+    def test_legacy_profile_defaults_to_short_without_rewriting(self):
+        value = profile()
+        value.pop("default_cycle")
+        self.save(self.user, value)
+        original = self.user.read_bytes()
+        loaded, _ = config.load_profile()
+        self.assertEqual(config.plan(loaded)["cycle"], "short")
+        self.assertNotIn("default_cycle", loaded)
+        self.assertEqual(self.user.read_bytes(), original)
+
+    def test_count_and_cycle_are_independent_temporary_choices(self):
+        value = profile()
+        value.update(default_participants=3, default_cycle="full")
+        original = copy.deepcopy(value)
+        self.assertEqual(config.plan(value, 2)["cycle"], "full")
+        result = config.plan(value, cycle="short")
+        self.assertEqual((result["participants"], result["cycle"]), (3, "short"))
+        result = config.plan(value, 2, cycle="short")
+        self.assertEqual((result["participants"], result["cycle"]), (2, "short"))
+        self.assertEqual(value, original)
+        for invalid in (None, [], True, "long"):
+            broken = copy.deepcopy(value)
+            broken["default_cycle"] = invalid
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                config.validate(broken)
+        with self.assertRaises(ValueError):
+            config.plan(value, cycle="long")
+
+    def test_explicit_update_keeps_exact_backup_and_unchanged_preferences(self):
+        previous = profile()
+        self.save(self.user, previous)
+        original = self.user.read_bytes()
+        revised = copy.deepcopy(previous)
+        revised["default_cycle"] = "full"
+        backup = Path(config.update_profile(self.user, revised))
+        self.assertEqual(backup.read_bytes(), original)
+        self.assertEqual(config.read_json(self.user), revised)
+        self.assertEqual(config.read_json(self.user)["roles"], previous["roles"])
+        before = self.user.read_bytes()
+        self.assertIsNone(config.update_profile(self.user, revised))
+        self.assertEqual(self.user.read_bytes(), before)
+        self.assertEqual(list(self.user.parent.glob("review.json.backup-*")), [backup])
+
+    def test_update_rejects_invalid_or_missing_destination_without_writing(self):
+        with self.assertRaises(FileNotFoundError):
+            config.update_profile(self.user, profile())
+        self.save(self.user, profile())
+        original = self.user.read_bytes()
+        broken = profile()
+        broken["default_cycle"] = "unknown"
+        with self.assertRaises(ValueError):
+            config.update_profile(self.user, broken)
+        self.assertEqual(self.user.read_bytes(), original)
+        self.assertEqual(list(self.user.parent.glob("review.json.backup-*")), [])
+
+    def test_update_detects_intervening_write_and_preserves_it(self):
+        self.save(self.user, profile())
+        original = self.user.read_bytes()
+        revised = profile()
+        revised["default_cycle"] = "full"
+        concurrent = b'{"someone": "else"}'
+        with mock.patch.object(Path, "read_bytes", side_effect=[original, concurrent]), \
+                mock.patch.object(config.os, "replace") as replace:
+            with self.assertRaisesRegex(ValueError, "changed during update"):
+                config.update_profile(self.user, revised)
+            replace.assert_not_called()
+        self.assertFalse(list(self.user.parent.glob("*.tmp")))
+
+    def test_cli_update_and_plan_respect_selected_source_and_do_not_save_overrides(self):
+        project = self.root / "project"
+        project.mkdir()
+        self.save(project / ".chust-review.json", config.empty_profile())
+        personal = self.save(self.root / "personal.json", profile())
+        revised = profile()
+        revised["default_cycle"] = "full"
+        incoming = self.save(self.root / "incoming.json", revised)
+        env = {**os.environ, "PYTHONUTF8": "1", "CHUST_REVIEW_CONFIG": str(personal)}
+        def invoke(*args):
+            return subprocess.run([sys.executable, str(SCRIPT), *args, "--project", str(project)],
+                                  capture_output=True, text=True, encoding="utf-8", timeout=15, env=env)
+        updated = invoke("update", "--config", str(personal), "--from-file", str(incoming))
+        self.assertEqual(updated.returncode, 0, updated.stderr)
+        result = json.loads(updated.stdout)
+        self.assertEqual(result["source"], str(personal))
+        self.assertTrue(Path(result["backup"]).is_file())
+        original = personal.read_bytes()
+        planned = invoke("plan", "--participants", "3", "--cycle", "short")
+        self.assertEqual(planned.returncode, 0, planned.stderr)
+        result = json.loads(planned.stdout)
+        self.assertEqual((result["participants"], result["cycle"]), (3, "short"))
+        self.assertEqual(personal.read_bytes(), original)
+        self.assertEqual(config.read_json(project / ".chust-review.json"), config.empty_profile())
+
+    def test_cli_project_update_never_falls_back_to_personal_profile(self):
+        project = self.root / "project"
+        project.mkdir()
+        personal = self.save(self.root / "personal.json", profile())
+        original = personal.read_bytes()
+        incoming = self.save(self.root / "incoming.json", config.empty_profile())
+        for selector in (None, str(personal)):
+            env = {**os.environ, "PYTHONUTF8": "1"}
+            if selector:
+                env["CHUST_REVIEW_CONFIG"] = selector
+            command = [sys.executable, str(SCRIPT), "update", "--project", str(project),
+                       "--from-file", str(incoming)]
+            result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8",
+                                    timeout=15, env=env)
+            with self.subTest(selector=selector):
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertFalse((project / ".chust-review.json").exists())
+                self.assertEqual(personal.read_bytes(), original)
+                self.assertFalse(list(self.root.glob("personal.json.backup-*")))
+
+    def test_cli_project_update_outranks_environment_when_project_file_exists(self):
+        project = self.root / "project"
+        project.mkdir()
+        project_file = self.save(project / ".chust-review.json", profile())
+        original_project = project_file.read_bytes()
+        personal = self.save(self.root / "personal.json", profile())
+        original_personal = personal.read_bytes()
+        incoming = self.save(self.root / "incoming.json", config.empty_profile())
+        env = {**os.environ, "PYTHONUTF8": "1", "CHUST_REVIEW_CONFIG": str(personal)}
+        result = subprocess.run([sys.executable, str(SCRIPT), "update", "--project", str(project),
+                                 "--from-file", str(incoming)], capture_output=True, text=True,
+                                encoding="utf-8", timeout=15, env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        outcome = json.loads(result.stdout)
+        self.assertEqual(outcome["source"], str(project_file))
+        self.assertEqual(Path(outcome["backup"]).read_bytes(), original_project)
+        self.assertEqual(config.read_json(project_file), config.empty_profile())
+        self.assertEqual(personal.read_bytes(), original_personal)
+
     def test_known_current_host_fills_an_unspecified_orchestrator(self):
         value = config.empty_profile()
         host = role("openai", "Codex")
