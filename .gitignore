@@ -9,3 +9,4 @@ dist/
 .install-backups/
 local-settings.json
 .chust-review.json
+.chust-review.json.backup-*

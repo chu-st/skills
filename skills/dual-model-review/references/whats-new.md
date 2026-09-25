@@ -1,5 +1,24 @@
 # What's new
 
+## 0.4.0
+
+- Select two/three participants independently of short/full cycles; old profiles
+  keep the short default without a rewrite.
+- Full investigation includes mutual critiques, author revisions, material
+  disagreement resolution, one common draft and independent closing checks.
+  Existing artifacts instead use reviews, a designated author's revision and checks.
+- Resolve disputes with discriminating evidence or the user's actual criteria;
+  a bounded cooperative round may propose checks or better options. Preserve
+  supported dissent; the third never decides by vote. See [disagreements.md](disagreements.md).
+- Interpret ordinary requests for a multi-model run, research or work; preserve
+  the deliverable and do not mistake product comparison for collaboration.
+- Conversational setup supports viewing, swapping and saving roles, temporary
+  choices and explicit access checks. Show access observations separately from
+  expected routes and model identity. Users need not edit JSON.
+- The optional helper adds backed-up `update --from-file`, `default_cycle` and
+  temporary `plan --cycle`. An explicit project update never falls back to the
+  user/environment profile. Model flags select a model but do not attest its identity.
+
 ## 0.3.1
 
 - Following a real Claude Fable review, `plan --host-file` can fill an unspecified

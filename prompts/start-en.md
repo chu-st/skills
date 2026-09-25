@@ -7,6 +7,7 @@ Orchestrator: [current agent or selected product/model]
 Second model: [exact model or model selected in a separate chat]
 Third model: [only for three participants; otherwise not called]
 Mode: [investigate / review an existing artifact / compare options]
+Cycle: [short, default / full]; choose independently of participant count.
 Constraints, date and available evidence: [scope]
 
 Preserve my question and criteria. For investigation, first develop your own answer;
@@ -24,8 +25,20 @@ the useful partial work without silently downgrading to two.
 
 Resolve material disagreements with primary sources, calculations or reproducible
 examples. Distinguish facts, hypotheses and preferences. Agreement is not proof.
-Confirm or reject each material finding. Normally use one first answer per peer
-and, only if needed, one focused follow-up in total. Do not decide by majority vote.
+Confirm or reject each material finding. In short mode use one first answer per
+peer and, if needed, one focused follow-up in total. In a full investigation each
+author critiques the other first answers, then revises their own with dispositions.
+Resolve remaining material disagreements: positions, evidence, what could change
+each conclusion, a discriminating check for facts or user criteria for plans.
+If useful, send all participants one bundled issue packet for one cooperative
+round. The third can propose checks or options, never cast a deciding vote.
+Perform authorized checks, retain open choices, then independently review one
+common draft with every peer. For existing artifacts use independent reviews,
+resolve disputed findings, let the designated author revise, then check that version.
+Announce the budget: full investigation uses four responses per peer, full review
+two; unresolved issues may add at most one cooperative response per peer. At most
+one further targeted follow-up across the run may address new material evidence
+within budget. Do not repeat rounds to force agreement or save temporary choices.
 Critique the claim actually made; do not strengthen it to refute it or invent
 rejected objections. No material findings is a legitimate result.
 

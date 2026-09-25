@@ -9,13 +9,15 @@ import os
 from pathlib import Path
 import re
 import sys
+import tempfile
 
 ROLES = ("orchestrator", "second", "third")
 TRANSPORTS = {"auto", "tool", "cli", "manual"}
+CYCLES = {"short", "full"}
 
 
 def empty_profile():
-    return {"schema_version": 1, "default_participants": 2,
+    return {"schema_version": 1, "default_participants": 2, "default_cycle": "short",
             "require_distinct_providers": True, "roles": dict.fromkeys(ROLES)}
 
 
@@ -46,12 +48,15 @@ def validate(profile):
     if "schema_version" in profile and (type(profile["schema_version"]) is not int
                                         or profile["schema_version"] != 1):
         raise ValueError("Unsupported schema_version; expected integer 1")
-    if set(profile) != set(empty_profile()):
-        raise ValueError("Expected schema_version, default_participants, require_distinct_providers, roles")
+    required = set(empty_profile()) - {"default_cycle"}
+    if not required <= set(profile) or set(profile) - set(empty_profile()):
+        raise ValueError("Expected schema_version, default_participants, require_distinct_providers, roles; optional default_cycle")
     if type(profile["default_participants"]) is not int or profile["default_participants"] not in (2, 3):
         raise ValueError("default_participants must be integer 2 or 3")
     if type(profile["require_distinct_providers"]) is not bool:
         raise ValueError("require_distinct_providers must be boolean")
+    if not isinstance(profile.get("default_cycle", "short"), str) or profile.get("default_cycle", "short") not in CYCLES:
+        raise ValueError("default_cycle must be short or full")
     if not isinstance(profile["roles"], dict) or set(profile["roles"]) != set(ROLES):
         raise ValueError("roles must contain orchestrator, second, third (null is allowed)")
     for role, value in profile["roles"].items():
@@ -95,7 +100,7 @@ def load_profile(explicit=None, project=None):
     return validate(read_json(path)), str(path)
 
 
-def plan(profile, participants=None, overrides=None, allow_same_provider=False, host=None):
+def plan(profile, participants=None, overrides=None, allow_same_provider=False, host=None, cycle=None):
     effective = copy.deepcopy(validate(profile))
     if allow_same_provider:
         effective["require_distinct_providers"] = False
@@ -113,6 +118,9 @@ def plan(profile, participants=None, overrides=None, allow_same_provider=False, 
     count = effective["default_participants"] if participants is None else participants
     if type(count) is not int or count not in (2, 3):
         raise ValueError("participants must be integer 2 or 3")
+    selected_cycle = effective.get("default_cycle", "short") if cycle is None else cycle
+    if not isinstance(selected_cycle, str) or selected_cycle not in CYCLES:
+        raise ValueError("cycle must be short or full")
     active = {role: effective["roles"][role] for role in ROLES[:count]}
     missing = [role for role, value in active.items() if value is None]
     selected = [(role, value) for role, value in active.items() if value is not None]
@@ -124,7 +132,7 @@ def plan(profile, participants=None, overrides=None, allow_same_provider=False, 
                 raise ValueError(f"{other_role} and {role} require different providers")
             if value["model"] and other["model"] and value["model"].casefold() == other["model"].casefold():
                 raise ValueError(f"{other_role} and {role} select the same model")
-    return {"participants": count, "roles": active,
+    return {"participants": count, "cycle": selected_cycle, "roles": active,
             "host_default_applied": host_default_applied,
             "require_distinct_providers": effective["require_distinct_providers"],
             "selection_status": "NEEDS_CONFIGURATION" if missing else "READY_TO_CHECK_ACCESS",
@@ -140,17 +148,47 @@ def initialize(path, profile):
         stream.write(payload)
 
 
+def update_profile(path, profile):
+    """Explicit whole-profile replacement, with validation and a unique backup."""
+    validate(profile)
+    previous = path.read_bytes()  # Missing destinations are not implicitly created.
+    validate(json.loads(previous.decode("utf-8-sig")))
+    payload = (json.dumps(profile, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    if json.loads(previous.decode("utf-8-sig")) == profile:
+        return None
+    with tempfile.NamedTemporaryFile(prefix=path.name + ".backup-", suffix=".json",
+                                     dir=path.parent, delete=False) as stream:
+        stream.write(previous)
+        backup = Path(stream.name)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(prefix="." + path.name + ".", suffix=".tmp",
+                                         dir=path.parent, delete=False) as stream:
+            stream.write(payload)
+            temporary = Path(stream.name)
+        if path.read_bytes() != previous:
+            raise ValueError("Profile changed during update; reread it before retrying")
+        os.replace(temporary, path)
+        return str(backup)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="action", required=True)
-    for name in ("init", "show", "plan"):
+    for name in ("init", "show", "plan", "update"):
         command = commands.add_parser(name)
         command.add_argument("--config", help="Explicit profile path")
         command.add_argument("--project", help="Explicit project root")
         if name == "init":
             command.add_argument("--from-file", help="Import an existing preference JSON")
+        elif name == "update":
+            command.add_argument("--from-file", required=True, help="Complete revised profile; validates and backs up the selected existing file")
         elif name == "plan":
             command.add_argument("--participants", type=int, choices=(2, 3))
+            command.add_argument("--cycle", choices=sorted(CYCLES), help="Temporary short/full cycle selection")
             command.add_argument("--roles-file", help="Temporary whole-role replacements as JSON")
             command.add_argument("--host-file", help="Known current host as one role record; fills an unspecified orchestrator")
             command.add_argument("--allow-same-provider", action="store_true",
@@ -162,6 +200,12 @@ def main(argv=None):
             profile = validate(read_json(args.from_file)) if args.from_file else empty_profile()
             initialize(path, profile)
             result = {"source": str(path), "profile": profile}
+        elif args.action == "update":
+            path, _ = select_path(args.config, args.project, for_write=True)
+            profile = validate(read_json(args.from_file))
+            backup = update_profile(path, profile)
+            result = {"source": str(path), "profile": profile, "changed": backup is not None,
+                      "backup": backup}
         else:
             profile, source = load_profile(args.config, args.project)
             if args.action == "show":
@@ -170,7 +214,7 @@ def main(argv=None):
                 overrides = read_json(args.roles_file) if args.roles_file else None
                 host = read_json(args.host_file) if args.host_file else None
                 result = {"source": source, **plan(profile, args.participants, overrides,
-                                                  args.allow_same_provider, host)}
+                                                  args.allow_same_provider, host, args.cycle)}
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 2 if result.get("selection_status") == "NEEDS_CONFIGURATION" else 0
     except (OSError, ValueError) as exc:

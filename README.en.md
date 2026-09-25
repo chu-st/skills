@@ -29,6 +29,26 @@ Gemini is third; default to two.” Then: “Review this plan with three models.
 is an example profile, not a package default. ChatGPT, Codex, and API access are
 distinct; the skill does not silently switch products or orchestrators.
 
+Choose **two/three participants** independently of a **short/full cycle**. For example:
+“Research this with three models, full cycle” or “Do this work with two models,
+short, this time only.” Ordinary research or comparing models as products does not
+implicitly request multiple model calls.
+
+Short is the default. A full investigation preserves independent first answers,
+mutual critiques and each author's revision, resolves material disagreements,
+then checks one common draft independently before final verification. An existing
+artifact instead receives independent reviews, a designated author's revision,
+and closing checks. Disagreements use evidence or user criteria, with bounded
+discussion and explicit unresolved choices. The lead remains one participant.
+See the [protocol and response budgets](skills/dual-model-review/references/protocol.md).
+The [research note](docs/disagreement-research.md) distinguishes supporting evidence
+from engineering hypotheses and transfer from human collaboration.
+
+Setup is conversational: show, swap roles, remember defaults, or use temporary
+choices. The agent handles the profile; users need not edit JSON. Summaries separate
+selected roles, expected access, actual observations and identity verification.
+Old profiles keep the short default; explicit updates preserve a backup.
+
 The [skill](skills/dual-model-review/SKILL.md) and references are in English so
 agents can reuse them; answer users in their own language. The README, onboarding,
 and research example are primarily in Russian.
