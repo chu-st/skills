@@ -38,6 +38,15 @@ official documentation and actual `--help` before configuring its noninteractive
 flags. Do not invent flags or promise a model based on a product name. Generic
 stdout is unverified; retain identity evidence from provider diagnostics separately.
 
+When the user chooses a family such as Pro, resolve its supported identifier from
+the selected route's actual model list, then pass it explicitly. Do not invent a
+universal Gemini/Pro ID or treat an accepted flag as a served-model receipt. A
+working route may return useful answers without reporting a model name; keep
+delivery and identity separate and do not repeatedly request permission for the
+already authorized route. Follow the user's local wrapper and billing policy.
+A failed subscription route never authorizes a silent paid API fallback. Private
+launch scripts, proxy settings and credentials are not public skill dependencies.
+
 `configure.py plan` resolves preferences only. It neither runs these calls nor
 proves their availability. `peer.py` remains a one-peer transport; the skill's
 orchestrator coordinates the chosen number of calls.
