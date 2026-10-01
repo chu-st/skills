@@ -2,7 +2,7 @@
 name: dual-model-review
 description: "Coordinate work, research, comparison, or review with two or three real models and configurable roles. Use for requests to run a task with multiple models, ask another model for a second opinion, or configure these preferences (прогон, исследование, работа двумя/тремя моделями). Supports short and full cycles. Ordinary research or comparing models as products alone does not request a multi-model run."
 metadata:
-  version: "0.4.0"
+  version: "0.4.1"
   author: "CHU.ST · Чувство управления"
 ---
 
@@ -11,7 +11,6 @@ metadata:
 Help the user get a better-supported answer through real model collaboration.
 The stable invocation remains `dual-model-review`; both participant counts belong
 to this one skill. Users can still name models in an ordinary prompt.
-Release changes: [What's new](references/whats-new.md).
 Work in the user's language. This method applies to research and everyday
 decisions as well as technical work. A repository, Python, and CLI are optional.
 

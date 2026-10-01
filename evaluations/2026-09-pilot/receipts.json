@@ -125,7 +125,7 @@
       "web_search_requests": 0,
       "web_fetch_requests": 0
     },
-    "unavailable_reason": "Claude account session limit; provider announced reset at 13:00 Europe/Moscow. No retry or substitute."
+    "unavailable_reason": "Claude account session limit. No retry or substitute."
   },
   {
     "execution_status": "PASS",
